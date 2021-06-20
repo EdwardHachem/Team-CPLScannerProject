@@ -1,7 +1,13 @@
 #include "BasicScanner.h"
 
-BasicScanner::BasicScanner(string sourceCode)
+BasicScanner::BasicScanner()
 {
+	initKeywords();
+}
+
+BasicScanner::BasicScanner(const string& sourceCode)
+{
+	initKeywords();
 	_sourceCode = sourceCode;
 }
 
@@ -14,6 +20,19 @@ list<BasicToken> BasicScanner::scanTokens()
 		scanToken();
 	}
 	return _tokens;
+}
+
+void BasicScanner::setSourceCode(const string& sourceCode)
+{
+	_sourceCode = sourceCode;
+}
+
+void BasicScanner::clear()
+{
+	_tokens.clear();
+	_sourceCode.clear();
+	_current = 0;
+	_start = 0;
 }
 
 void BasicScanner::scanToken()
@@ -146,7 +165,7 @@ char BasicScanner::advanceChar()
 	return _sourceCode[_current++];
 }
 
-void BasicScanner::addToken(TokenType type, string data)
+void BasicScanner::addToken(TokenType type, const string& data)
 {
 	_tokens.push_back(BasicToken(type, data));
 }
@@ -160,7 +179,7 @@ void BasicScanner::addStringToken()
 	}
 	if (_sourceCode[_current] == '"')
 	{
-		string strliteral = _sourceCode.substr(_start + 1, _current - 1);
+		string strliteral = _sourceCode.substr(_start + 1, _current - 1 - _start);
 		addToken(TokenType::STRINGLITERAL, strliteral);
 	}
 }
@@ -188,7 +207,7 @@ void BasicScanner::addKeywordToken()
 	{
 		_current++;
 	}
-	string identifier =  _sourceCode.substr(_start, _current);
+	string identifier =  _sourceCode.substr(_start, _current - _start);
 	for (int i = 0; i < identifier.length(); i++)
 	{
 		identifier[i] = tolower(identifier[i]);
@@ -227,13 +246,8 @@ void BasicScanner::addNumberToken()
 			}
 		}
 	}
-	string numliteral = _sourceCode.substr(_start, _current);
+	string numliteral = _sourceCode.substr(_start, _current - _start);
 	addToken(TokenType::NUMBERLITERAL, numliteral);
-}
-
-list<BasicToken> BasicScanner::getTokens()
-{
-	return _tokens; 
 }
 
 

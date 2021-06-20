@@ -1,3 +1,5 @@
-Hi, this is a test
-This is line 2
-and line 3
+dim b = a
+a + c
+if a >= c
+a = "Edward + Hachem"
+a = 29.42

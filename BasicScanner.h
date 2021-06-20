@@ -8,10 +8,11 @@ using namespace std;
 class BasicScanner
 {
 public:
-	BasicScanner(string sourceCode); 
+	BasicScanner();
+	BasicScanner(const string& sourceCode); 
 	list<BasicToken> scanTokens();
-	list<BasicToken> getTokens();
-
+	void setSourceCode(const string& sourceCode);
+	void clear();
 private:
 	void scanToken();
 	size_t _start = 0;
@@ -21,7 +22,7 @@ private:
 	map <string, TokenType> keywords;
 	void initKeywords();
 	char advanceChar();
-	void addToken(TokenType type, string data);
+	void addToken(TokenType type, const string& data);
 	void addStringToken();
 	bool isAlpha(char c);
 	bool isAlphaNumeric(char c);
