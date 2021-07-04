@@ -1,5 +1,3 @@
 dim b = a
-a + c
-if a >= c
-a = "Edward + Hachem"
-a = 29.42
+a = 5
+c = "abc"

@@ -12,10 +12,11 @@ enum class TokenType {
 class BasicToken
 {
 public:
-	BasicToken(TokenType type, string lexeme);
+	BasicToken(TokenType type, string lexeme, int linenumber);
 	void printToken();
 
 private:
+	int _linenumber;
 	TokenType _type;
 	string _lexeme;
 };

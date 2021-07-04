@@ -1,4 +1,6 @@
 #include "BasicScanner.h"
+#include "Identifier.h"
+#include "LanguageProcessor.h"
 
 BasicScanner::BasicScanner()
 {
@@ -19,17 +21,19 @@ list<BasicToken> BasicScanner::scanTokens()
 		_start = _current;
 		scanToken();
 	}
-	return _tokens;
+	return _allTokens;
 }
 
-void BasicScanner::setSourceCode(const string& sourceCode)
+void BasicScanner::setSourceCode(map <string, Identifier>& identifiers, const string& sourceCode, int linenumber)
 {
+	_linenumber = linenumber;
 	_sourceCode = sourceCode;
+	_identifiers = &identifiers;
 }
 
 void BasicScanner::clear()
 {
-	_tokens.clear();
+	_allTokens.clear();
 	_sourceCode.clear();
 	_current = 0;
 	_start = 0;
@@ -118,6 +122,7 @@ void BasicScanner::scanToken()
 	}
 }
 
+//Keyword Table
 void BasicScanner::initKeywords()
 {
 	keywords["'"] = TokenType::APOSTROPHE;
@@ -167,7 +172,25 @@ char BasicScanner::advanceChar()
 
 void BasicScanner::addToken(TokenType type, const string& data)
 {
-	_tokens.push_back(BasicToken(type, data));
+	if (type == TokenType::NUMBERLITERAL || type == TokenType::STRINGLITERAL || type == TokenType::IDENTIFIER)
+	{
+		Identifier identifierInstance;
+		identifierInstance.name = data;
+		identifierInstance.identifierType = type;
+		switch (type) {
+		case TokenType::IDENTIFIER:
+			break;
+		case TokenType::NUMBERLITERAL:
+			identifierInstance.valueDouble = stod(data);
+			break;
+		default:
+			identifierInstance.valueString = data;
+			break;
+		}
+		(*_identifiers)[data] = identifierInstance;
+	}
+
+	_allTokens.push_back(BasicToken(type, data, _linenumber));
 }
 
 void BasicScanner::addStringToken()
@@ -223,7 +246,6 @@ void BasicScanner::addKeywordToken()
 	{
 		//Token not in our keywords list, so this is an identifier
 		addToken(TokenType::IDENTIFIER, identifier);
-
 	}
 }
 

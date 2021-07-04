@@ -143,11 +143,13 @@
     <ClCompile Include="BasicScanner.cpp" />
     <ClCompile Include="BasicToken.cpp" />
     <ClCompile Include="CPLScannerProject.cpp" />
+    <ClCompile Include="Identifier.cpp" />
     <ClCompile Include="LanguageProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicScanner.h" />
     <ClInclude Include="BasicToken.h" />
+    <ClInclude Include="Identifier.h" />
     <ClInclude Include="LanguageProcessor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
