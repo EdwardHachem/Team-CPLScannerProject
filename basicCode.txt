@@ -1,3 +1,4 @@
-dim b = a
-a = 5
-c = "abc"
+100 dim b = a
+110 a = 5
+120 c = "abc"
+130 abc

@@ -12,8 +12,10 @@ public:
 	LanguageProcessor() {};
 	void processLine(string code, int linenumber);
 	void processFile(string fileName);
+	void printTokens();
 private:
 	map <string, Identifier> identifiers;
+	list<BasicToken> _tokens;
 	BasicScanner scanner;
 };
 

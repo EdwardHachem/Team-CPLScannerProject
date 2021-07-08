@@ -32,5 +32,6 @@ private:
 	bool isDigit(char c);
 	void addKeywordToken();
 	void addNumberToken();
+	void addLineToken();
 };
 

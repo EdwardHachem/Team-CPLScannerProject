@@ -107,7 +107,11 @@ void BasicScanner::scanToken()
 		}
 		break;
 	default:
-		if (isDigit(c))
+		if (isDigit(c) || _current == 0)
+		{
+			addLineToken();
+		}
+		else if (isDigit(c))
 		{
 			addNumberToken();
 		}
@@ -163,6 +167,16 @@ void BasicScanner::initKeywords()
 	keywords["wend"] = TokenType::WEND;
 	keywords["while"] = TokenType::WHILE;
 	keywords["xor"] = TokenType::XOR;
+	keywords["goto"] = TokenType::GOTO;
+	keywords["print"] = TokenType::PRINT;
+	keywords["def"] = TokenType::DEF;
+	keywords["for"] = TokenType::FOR;
+	keywords["let"] = TokenType::LET;
+	keywords["next"] = TokenType::NEXT;
+	keywords["int"] = TokenType::INT;
+	keywords["rnd"] = TokenType::RND;
+	keywords["("] = TokenType::LEFTPAREN;
+	keywords[")"] = TokenType::RIGHTPAREN;
 }
 
 char BasicScanner::advanceChar()
@@ -272,4 +286,13 @@ void BasicScanner::addNumberToken()
 	addToken(TokenType::NUMBERLITERAL, numliteral);
 }
 
-
+void BasicScanner::addLineToken()
+{
+	while (_current < _sourceCode.length() &&
+		isDigit(_sourceCode[_current]))
+	{
+		_current++;
+	}
+	string linenumber = _sourceCode.substr(_start, _current - _start);
+	addToken(TokenType::PROGRAMLINENUMBER, linenumber);
+}

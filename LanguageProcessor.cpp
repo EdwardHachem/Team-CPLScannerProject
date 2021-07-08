@@ -1,6 +1,7 @@
 #include "LanguageProcessor.h"
 #include <string>
 #include <ostream>
+#include "BasicParser.h"
 using namespace std;
 
 void LanguageProcessor::processLine(string code, int linenumber)
@@ -8,18 +9,10 @@ void LanguageProcessor::processLine(string code, int linenumber)
 	// Get an instance of scanner and call get tokens.
 	scanner.clear();
 	scanner.setSourceCode(identifiers, code, linenumber);
+	//  scan this line into tokens
 	list<BasicToken> tokens = scanner.scanTokens();
-	list<BasicToken>::iterator tokenIt;
-	for (tokenIt = tokens.begin(); tokenIt != tokens.end(); ++tokenIt)
-	{
-		tokenIt->printToken();	
-	}
-	cout << "Identifier Table" << endl;
-	map <string, Identifier>::iterator identifierIt;
-	for (identifierIt = identifiers.begin(); identifierIt != identifiers.end(); ++identifierIt)
-	{
-		cout << identifierIt->second << endl;
-	}
+	// append the new line token list into our master token list
+	_tokens.splice(_tokens.end(), tokens);
 }
 
 void LanguageProcessor::processFile(string fileName)
@@ -32,10 +25,29 @@ void LanguageProcessor::processFile(string fileName)
 		while (getline(testfile, line))
 		{
 			cout << line << '\n';
-			processLine(line, ++linenumber);
-
+			processLine(line, ++linenumber); // this builds our _tokens list
 		}
 		testfile.close();
+
+		printTokens();
+		
+		BasicParser parser(_tokens);
+
 	}
 	else cout << "File not found.";
+}
+
+void LanguageProcessor::printTokens()
+{
+	list<BasicToken>::iterator tokenIt;
+	for (tokenIt = _tokens.begin(); tokenIt != _tokens.end(); ++tokenIt)
+	{
+		tokenIt->printToken();
+	}
+	cout << "Identifier Table" << endl;
+	map <string, Identifier>::iterator identifierIt;
+	for (identifierIt = identifiers.begin(); identifierIt != identifiers.end(); ++identifierIt)
+	{
+		cout << identifierIt->second << endl;
+	}
 }
