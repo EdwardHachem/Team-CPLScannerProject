@@ -181,8 +181,13 @@ void BasicScanner::initKeywords()
 	keywords["next"] = TokenType::NEXT;
 	keywords["int"] = TokenType::INT;
 	keywords["rnd"] = TokenType::RND;
+	keywords["return"] = TokenType::RETURN;
+	keywords["stop"] = TokenType::STOP;
 	keywords["("] = TokenType::LEFTPAREN;
 	keywords[")"] = TokenType::RIGHTPAREN;
+	keywords["gosub"] = TokenType::GOSUB;
+	keywords["input"] = TokenType::INPUT;
+	keywords["read"] = TokenType::READ;
 }
 
 char BasicScanner::advanceChar()

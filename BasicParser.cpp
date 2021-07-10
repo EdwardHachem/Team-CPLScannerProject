@@ -81,5 +81,146 @@ void BasicParser::parseStatements()
 /// </summary>
 void BasicParser::parseStatement()
 {
+	BasicToken token = *_tokenIt;
+	switch (token.type)
+	{
 
+	case TokenType::DIM:
+		break;
+
+	case TokenType::END:
+		break;
+
+	case TokenType::FOR:
+		break;
+
+	case TokenType::GOTO:
+		break;
+
+	case TokenType::GOSUB:
+		break;
+
+	case TokenType::IF:
+		//IF <Expression> THEN Number_Literal
+		_tokenIt++;
+		int exp1 = parseExpression();
+		if ((*_tokenIt).type == TokenType::THEN)
+		{
+			_tokenIt++;
+			int gotoLinenumber = stoi((*_tokenIt).lexeme);
+		}
+		else
+		{
+			error("Expected \"then\" ", ((*_tokenIt).linenumber));
+		}
+		break;
+
+	case TokenType::INPUT:
+		break;
+
+	case TokenType::LET:
+		break;
+
+	case TokenType::NEXT:
+		break;
+
+	case TokenType::PRINT:
+		break;
+
+	case TokenType::READ:
+		break;
+
+	case TokenType::RETURN:
+		break;
+
+	case TokenType::REM:
+		break;
+
+	default:
+		//Check function expression, otherwise error.
+	}
+}
+/// <summary>
+/// <Expression> --> <And Expression> OR <Expression>
+///					| <And Expression>
+/// </summary>
+/// <returns></returns>
+int BasicParser::parseExpression()
+{
+	BasicToken token = *_tokenIt;
+	parseAndExpression();
+	if ((*_tokenIt).type == TokenType::OR)
+	{
+		_tokenIt++;
+		parseExpression();
+	}
+	return 0;
+}
+
+/// <summary>
+/// <And Expression> --> <Not Expression> AND <And Expression>
+///						| <Not Expression>
+/// </summary>
+/// <returns></returns>
+int BasicParser::parseAndExpression()
+{
+	BasicToken token = *_tokenIt;
+	parseNotExpression();
+	if ((*_tokenIt).type == TokenType::AND)
+	{
+		_tokenIt++;
+		parseAndExpression();
+	}
+	return 0;
+}
+
+/// <summary>
+/// <Not Expression> --> NOT <Compare Expression>
+///						| <Compare Expression>
+/// </summary>
+/// <returns></returns>
+int BasicParser::parseNotExpression()
+{
+	BasicToken token = *_tokenIt;
+	if ((*_tokenIt).type == TokenType::NOT)
+	{
+		_tokenIt++;
+		parseCompareExpression();
+	}
+	else
+	{
+		parseCompareExpression();
+	}
+	return 0;
+}
+
+/// <summary>
+/// <Compare Expression> --> <Addition Expression> = <Compare Expression>
+///							| <Addition Expression> > <Compare Expression>
+///							| <Addition Expression> >= <Compare Expression>
+///							| <Addition Expression> <> <Compare Expression>
+///							| <Addition Expression> < <Compare Expression>
+///								| <Addition Expression> <= <Compare Expression>
+///								| <Addition Expression>
+/// </summary>
+/// <returns></returns>
+int BasicParser::parseCompareExpression()
+{
+	BasicToken token = *_tokenIt;
+	//parseAddExpression();
+	switch ((*_tokenIt).type)
+	{
+	case TokenType::EQUAL:
+	case TokenType::GREATERTHAN:
+	case TokenType::GREATERTHANOREQUALTO:
+	case TokenType::NOTEQUAL:
+	case TokenType::LESSTHAN:
+	case TokenType::LESSTHANOREQUALTO:
+		_tokenIt++;
+		parseCompareExpression();
+		break;
+	default:
+		break;
+	}
+	return 0;
 }

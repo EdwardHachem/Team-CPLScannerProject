@@ -15,6 +15,10 @@ public:
 	void parseLine();
 	void parseStatements();
 	void parseStatement();
+	int parseExpression();
+	int parseAndExpression();
+	int parseNotExpression();
+	int parseCompareExpression();
 
 	char dividers[3] = { ',', ';', ':' };
 private:
