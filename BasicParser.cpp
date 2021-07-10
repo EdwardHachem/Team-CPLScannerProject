@@ -207,7 +207,7 @@ int BasicParser::parseNotExpression()
 int BasicParser::parseCompareExpression()
 {
 	BasicToken token = *_tokenIt;
-	//parseAddExpression();
+	parseAddExpression();
 	switch ((*_tokenIt).type)
 	{
 	case TokenType::EQUAL:
@@ -224,3 +224,118 @@ int BasicParser::parseCompareExpression()
 	}
 	return 0;
 }
+
+/// <summary>
+/// <Addition Expression> --> <Multiplication Expression> + <Addition Expression>
+///							| <Multiplication Expression> -<Addition Expression>
+///							| <Multiplication Expression>
+/// </summary>
+/// <returns></returns>
+int BasicParser::parseAddExpression()
+{
+	BasicToken token = *_tokenIt;
+	parseMultExpression();
+	switch ((*_tokenIt).type)
+	{
+	case TokenType::ADD:
+	case TokenType::SUBTRACT:
+		//put the (*_tokenIt).type in parse tree
+		_tokenIt++;
+		parseAddExpression();
+		break;
+	default:
+		break;
+	}
+	return 0;
+}
+
+/// <summary>
+/// <Multiplication Expression> --> <Negate Expression> * <Multiplication Expression>
+///								| <Negate Expression> / <Multiplication Expression>
+///								| <Negate Expression>
+/// </summary>
+/// <returns></returns>
+int BasicParser::parseMultExpression()
+{
+	BasicToken token = *_tokenIt;
+	parseNegateExpression();
+	switch ((*_tokenIt).type)
+	{
+	case TokenType::MULTIPLY:
+	case TokenType::DIVIDE:
+		//put the (*_tokenIt).type in parse tree
+		_tokenIt++;
+		parseMultExpression();
+		break;
+	default:
+		break;
+	}
+	return 0;
+}
+
+/// <summary>
+/// <Negate Expression> --> - <Value>
+///						| <Value>
+/// </summary>
+/// <returns></returns>
+int BasicParser::parseNegateExpression()
+{
+	BasicToken token = *_tokenIt;
+	if ((*_tokenIt).lexeme == "-")
+	{
+		//put negative lexeme into parse tree
+		_tokenIt++;
+		parseValue();
+	}
+	else
+	{
+		parseValue();
+	}
+
+	return 0;
+}
+
+
+/// <summary>
+/// <Value> --> ( <Expression> )
+///				| Identifier
+///				| <Constant>
+///				| <Function Expression>
+/// </summary>
+/// <returns></returns>
+
+int BasicParser::parseValue()
+{
+	BasicToken token = *_tokenIt;
+	switch (token.type)
+	{
+	case TokenType::LEFTPAREN:
+		//put the (*_tokenIt).type in parse tree
+		_tokenIt++;
+		parseExpression();
+		break;
+	case TokenType::RIGHTPAREN:
+		//put the (*_tokenIt).type in parse tree
+		//assert that there was a leftparen token type in parse tree before
+		//otherwise throw an error
+		//unsure what to do after a right paren, do we parse the next token at the expression level?	
+		break;
+	case TokenType::IDENTIFIER:
+		_tokenIt++;
+		//save name of identifier here
+		string identifier = token.lexeme;
+		parseValue();
+		break;
+	case TokenType::NUMBERLITERAL:
+
+		break;
+	case TokenType::STRINGLITERAL:
+		break;
+	default:
+		break;
+	}
+
+	
+	return 0;
+}
+
