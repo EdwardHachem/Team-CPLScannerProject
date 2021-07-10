@@ -77,6 +77,12 @@ void BasicScanner::scanToken()
 	case '=':
 		addToken(keywords["="], "=");
 		break;
+	case '(':
+		addToken(keywords["("], "(");
+		break;
+	case ')':
+		addToken(keywords[")"], ")");
+		break;
 
 //Now check for 2 character operators before one character.
 	case '<':

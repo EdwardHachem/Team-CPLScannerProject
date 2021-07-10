@@ -143,7 +143,6 @@
     <ClCompile Include="BasicParser.cpp" />
     <ClCompile Include="BasicScanner.cpp" />
     <ClCompile Include="BasicToken.cpp" />
-    <ClCompile Include="BNF.cpp" />
     <ClCompile Include="CPLScannerProject.cpp" />
     <ClCompile Include="Identifier.cpp" />
     <ClCompile Include="LanguageProcessor.cpp" />
@@ -152,7 +151,6 @@
     <ClInclude Include="BasicParser.h" />
     <ClInclude Include="BasicScanner.h" />
     <ClInclude Include="BasicToken.h" />
-    <ClInclude Include="BNF.h" />
     <ClInclude Include="Identifier.h" />
     <ClInclude Include="LanguageProcessor.h" />
   </ItemGroup>

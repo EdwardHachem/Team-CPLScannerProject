@@ -17,8 +17,8 @@ public:
 	BasicToken(TokenType type, string lexeme, int linenumber);
 	void printToken();
 
-	int _linenumber;
-	TokenType _type;
-	string _lexeme;
+	int linenumber;
+	TokenType type;
+	string lexeme;
 };
 

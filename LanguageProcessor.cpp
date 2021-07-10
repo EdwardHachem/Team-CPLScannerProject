@@ -31,8 +31,9 @@ void LanguageProcessor::processFile(string fileName)
 
 		printTokens();
 		
-		BasicParser parser(_tokens);
-
+		BasicParser parser;
+		parser.init(&_tokens, &identifiers);
+		parser.parse();
 	}
 	else cout << "File not found.";
 }

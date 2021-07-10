@@ -2,13 +2,13 @@
 
 BasicToken::BasicToken(TokenType type, string lexeme, int linenumber)
 {
-	_linenumber = linenumber;
-	_type = type;
-	_lexeme = lexeme;
+	this->linenumber = linenumber;
+	this->type = type;
+	this->lexeme = lexeme;
 }
 
 void BasicToken::printToken() //Prints the token type and Lexeme.
 {
-	cout << "Line: " << _linenumber << " Token Type:" << (int)_type << " Lexeme: " << _lexeme << endl;
+	cout << "Line: " << linenumber << " Token Type:" << (int)type << " Lexeme: " << lexeme << endl;
 }
 
