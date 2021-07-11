@@ -4,6 +4,7 @@
 
 BasicScanner::BasicScanner()
 {
+	
 	initKeywords();
 }
 
@@ -21,11 +22,13 @@ list<BasicToken> BasicScanner::scanTokens()
 		_start = _current;
 		scanToken();
 	}
+	addToken(TokenType::EOL, "");
 	return _allTokens;
 }
 
 void BasicScanner::setSourceCode(map <string, Identifier>& identifiers, const string& sourceCode, int linenumber)
 {
+	_newLine = true;
 	_linenumber = linenumber;
 	_sourceCode = sourceCode;
 	_identifiers = &identifiers;
@@ -113,7 +116,7 @@ void BasicScanner::scanToken()
 		}
 		break;
 	default:
-		if (isDigit(c) || _current == 0)
+		if (isDigit(c) && _newLine)
 		{
 			addLineToken();
 		}
@@ -197,7 +200,10 @@ char BasicScanner::advanceChar()
 
 void BasicScanner::addToken(TokenType type, const string& data)
 {
-	if (type == TokenType::NUMBERLITERAL || type == TokenType::STRINGLITERAL || type == TokenType::IDENTIFIER)
+	_newLine = false;
+	if (type == TokenType::NUMBERINTLITERAL || type == TokenType::NUMBERDBLLITERAL ||
+		type == TokenType::STRINGLITERAL || 
+		type == TokenType::IDENTIFIER)
 	{
 		Identifier identifierInstance;
 		identifierInstance.name = data;
@@ -205,8 +211,10 @@ void BasicScanner::addToken(TokenType type, const string& data)
 		switch (type) {
 		case TokenType::IDENTIFIER:
 			break;
-		case TokenType::NUMBERLITERAL:
+		case TokenType::NUMBERDBLLITERAL:
 			identifierInstance.valueDouble = stod(data);
+		case TokenType::NUMBERINTLITERAL:
+			identifierInstance.valueInt = stoi(data);
 			break;
 		default:
 			identifierInstance.valueString = data;
@@ -276,6 +284,7 @@ void BasicScanner::addKeywordToken()
 
 void BasicScanner::addNumberToken()
 {
+	TokenType type = TokenType::NUMBERINTLITERAL;
 	while (_current < _sourceCode.length() &&
 		isDigit(_sourceCode[_current]))
 	{
@@ -283,6 +292,7 @@ void BasicScanner::addNumberToken()
 	}
 	if (_sourceCode[_current] == '.' && _current < _sourceCode.length())
 	{
+		type = TokenType::NUMBERDBLLITERAL;
 		if (isDigit(_sourceCode[_current + 1]))
 		{
 			_current++;
@@ -294,7 +304,7 @@ void BasicScanner::addNumberToken()
 		}
 	}
 	string numliteral = _sourceCode.substr(_start, _current - _start);
-	addToken(TokenType::NUMBERLITERAL, numliteral);
+	addToken(type, numliteral);
 }
 
 void BasicScanner::addLineToken()

@@ -30,7 +30,29 @@ private:
 	map<string, Identifier > *_pidentifiers;
 	list<BasicToken>::iterator _tokenIt;
 
-	int P[1000];
+
+	enum class CMD {	BZ, BR, BP, 
+				ASSIGN, PLUS, MINUS, MULT, DIV, 
+				EQ, GT, GTE, LT, LTE, NE, NOT,
+				STRING, CONST, IDENTIFIER,
+				PRINT, LINENUMBER
+			};
+
+	struct P_struct{
+		CMD cmd;
+		union {
+			int value;
+			Identifier* ptr;
+		};
+	};
+
+	P_struct P[10000];
+	int Px=0;
+
+	map<int, int> ProgramLineNumberToPx;
+	void pushP(CMD, Identifier *ptr);
+
+	void pushP(CMD, int value=0);
 
 	void error(const string& msg, int linenumber) {
 		cout << linenumber << " " << msg << endl;

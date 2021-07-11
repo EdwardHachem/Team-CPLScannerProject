@@ -15,6 +15,7 @@ public:
 	void setSourceCode(map <string, Identifier> &identifiers, const string& sourceCode, int linenumber);
 	void clear();
 private:
+	bool _newLine;
 	int _linenumber;
 	void scanToken();
 	size_t _start = 0;

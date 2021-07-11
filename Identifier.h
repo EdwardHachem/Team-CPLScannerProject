@@ -11,7 +11,10 @@ class Identifier
 public:
 	string name;
 	TokenType identifierType;
-	double valueDouble;
+	union {
+		int valueInt;
+		double valueDouble;
+	};
 	string valueString;
 	friend ostream& operator<<(ostream& os, const Identifier& identifier);
 private:
