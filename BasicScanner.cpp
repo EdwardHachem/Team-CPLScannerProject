@@ -73,6 +73,10 @@ void BasicScanner::scanToken()
 		addToken(keywords["-"], "-");
 		break;
 
+	case '^':
+		addToken(keywords["^"], "^");
+		break;
+
 	case '\\':
 		addToken(keywords["\\"], "\\");
 		break;
@@ -194,6 +198,7 @@ void BasicScanner::initKeywords()
 	keywords["negate"] = TokenType::NEGATE;
 	keywords["sqr"] = TokenType::SQR;
 	keywords["exp"] = TokenType::EXP;
+	keywords["to"] = TokenType::TO;
 }
 
 char BasicScanner::advanceChar()

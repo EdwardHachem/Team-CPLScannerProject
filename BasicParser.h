@@ -23,11 +23,12 @@ public:
 	int parseMultExpression();
 	int parseNegateExpression();
 	int parseFunctionExpression();
-	int parseValue();
+	int parseFOR();
+	BasicToken parseValue();
 	int parseIdentifierList();
 	int parsePrintList();
 
-	char dividers[3] = { ',', ';', ':' };
+	char dividers[3] = {',', ';', ':'};
 private:
 	list<BasicToken> *_ptokens;
 	map<string, Identifier> *_pidentifiers;
@@ -36,8 +37,8 @@ private:
 
 	enum class CMD {	BZ, BR, BP, 
 				ASSIGN, PLUS, MINUS, MULT, DIV, 
-				EQ, GT, GTE, LT, LTE, NE, NOT, RND, SQR, EXP, INPUT,
-				STRING, CONST, IDENTIFIER, 
+				EQ, GT, GTE, LT, LTE, NE, NOT, RND, SQR, EXP, INPUT, INT,
+				STRING, CONST, IDENTIFIER, NOP,
 				PRINT, LINENUMBER
 			};
 
@@ -54,9 +55,9 @@ private:
 
 	map<int, int> ProgramLineNumberToPx;
 	void pushP(CMD, Identifier *ptr);
-
 	void pushP(CMD, int value=0);
 
+	bool advanceToken();
 	void error(const string& msg, int linenumber) {
 		cout << linenumber << " " << msg << endl;
 	}
