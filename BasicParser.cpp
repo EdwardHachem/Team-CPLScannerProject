@@ -36,11 +36,11 @@ void BasicParser::parseLine()
 			// save it in a lookup to the current Px index, the address of this line in the P array 
 			ProgramLineNumberToPx[lineNumber] = Px;
 
-			_tokenIt++; // advance to next token
+			advanceToken(); // advance to next token
 			parseStatements();
 		}
 		else {
-			_tokenIt++;
+			advanceToken();
 			error("error: expected basic line Number. line:", token.linenumber);
 		}
 	}
@@ -57,16 +57,15 @@ void BasicParser::parseStatements()
 
 	// now token iterator should be after statement.
 	// if there's divider, continue parsing next statement
-	BasicToken token = *_tokenIt;
 	while ( (_tokenIt != _ptokens->end() && 
 			(*_tokenIt).type != TokenType::EOL) &&
-		token.lexeme.find_first_of(dividers) >= 0)
+		(*_tokenIt).lexeme.find_first_of(dividers) >= 0)
 	{
-		_tokenIt++;
+		advanceToken();
 		parseStatement();
 	}
-	if ((*_tokenIt).type == TokenType::EOL)
-		_tokenIt++;
+	if ((_tokenIt != _ptokens->end() && (*_tokenIt).type == TokenType::EOL))
+		advanceToken();
 }
 
 /// <summary>
@@ -101,7 +100,7 @@ void BasicParser::parseStatement()
 
 	case TokenType::END:
 		while (_tokenIt != _ptokens->end())
-			_tokenIt++;
+			advanceToken();
 		break;
 
 	case TokenType::FOR:
@@ -109,13 +108,15 @@ void BasicParser::parseStatement()
 		break;
 
 	case TokenType::GOTO:
+	{
 		//push line number
-		_tokenIt++;
-		parseValue();
-
+		advanceToken();
+		int codeLineNumber = stoi((*_tokenIt).lexeme);
+		pushP(CMD::LINENUMBER, codeLineNumber);
 		//push branch
 		pushP(CMD::BR);
 		break;
+	}
 
 	case TokenType::GOSUB:
 		break;
@@ -126,12 +127,12 @@ void BasicParser::parseStatement()
 		//	Expr, 
 		//	Number_Literal (the lineNumber to go to if true)
 		//	BP (branches to the true address if result is true), 
-		_tokenIt++;
+		advanceToken();
 		int exp1 = parseExpression();
 		// pushed by the expression
 		if ((*_tokenIt).type == TokenType::THEN)
 		{
-			_tokenIt++;
+			advanceToken();
 			int codeLineNumber = stoi((*_tokenIt).lexeme);
 			pushP(CMD::LINENUMBER, codeLineNumber);
 			pushP(CMD::BP, NULL);
@@ -145,7 +146,7 @@ void BasicParser::parseStatement()
 
 	//Identifier List
 	case TokenType::INPUT:
-		_tokenIt++;
+		advanceToken();
 		parseValue();
 		
 		//push input
@@ -160,17 +161,17 @@ void BasicParser::parseStatement()
 		// 
 		string name; //identifer name
 		int value;
-		_tokenIt++;
+		advanceToken();
 		if ((*_tokenIt).type == TokenType::IDENTIFIER)
 		{
 			name = (*_tokenIt).lexeme;
 			Identifier* pid = &(*_pidentifiers)[name];
 			pushP(CMD::IDENTIFIER, pid);
 
-			_tokenIt++;
+			advanceToken();
 			if ((*_tokenIt).type == TokenType::EQUAL)
 			{
-				_tokenIt++;
+				advanceToken();
 				value = parseExpression();
 				// pushed by expression
 				pushP(CMD::ASSIGN);
@@ -187,7 +188,7 @@ void BasicParser::parseStatement()
 
 	case TokenType::PRINT:
 		
-		_tokenIt++;
+		advanceToken();
 		parsePrintList();
 		// push print cmd
 		pushP(CMD::PRINT);
@@ -202,7 +203,7 @@ void BasicParser::parseStatement()
 	case TokenType::REM:
 		// consume and ignore all tokens on the line
 		while (_tokenIt != _ptokens->end() && (*_tokenIt).type!=TokenType::EOL)
-			_tokenIt++;
+			advanceToken();
 		break;
 
 
@@ -230,7 +231,7 @@ int BasicParser::parseExpression()
 	int left = parseAndExpression();
 	if ((*_tokenIt).type == TokenType::OR)
 	{
-		_tokenIt++;
+		advanceToken();
 		int right = parseExpression();
 		return left || right;
 	}
@@ -248,7 +249,7 @@ int BasicParser::parseAndExpression()
 	int left = parseNotExpression();
 	if ((*_tokenIt).type == TokenType::AND)
 	{
-		_tokenIt++;
+		advanceToken();
 		int right = parseAndExpression();
 		return left && right;
 	}
@@ -265,7 +266,7 @@ int BasicParser::parseNotExpression()
 	BasicToken token = *_tokenIt;
 	if ((*_tokenIt).type == TokenType::NOT)
 	{
-		_tokenIt++;
+		advanceToken();
 		parseCompareExpression();
 		pushP(CMD::NOT);
 	}
@@ -293,32 +294,32 @@ int BasicParser::parseCompareExpression()
 	switch ((*_tokenIt).type)
 	{
 	case TokenType::EQUAL:
-		_tokenIt++;
+		advanceToken();
 		parseCompareExpression();
 		pushP(CMD::EQ);
 		break;
 	case TokenType::GREATERTHAN:
-		_tokenIt++;
+		advanceToken();
 		parseCompareExpression();
 		pushP(CMD::GT);
 		break;
 	case TokenType::GREATERTHANOREQUALTO:
-		_tokenIt++;
+		advanceToken();
 		parseCompareExpression();
 		pushP(CMD::GTE);
 		break;
 	case TokenType::NOTEQUAL:
-		_tokenIt++;
+		advanceToken();
 		parseCompareExpression();
 		pushP(CMD::NE);
 		break;
 	case TokenType::LESSTHAN:
-		_tokenIt++;
+		advanceToken();
 		parseCompareExpression();
 		pushP(CMD::LT);
 		break;
 	case TokenType::LESSTHANOREQUALTO:
-		_tokenIt++;
+		advanceToken();
 		parseCompareExpression();
 		pushP(CMD::LTE);
 		break;
@@ -342,13 +343,13 @@ int BasicParser::parseAddExpression()
 	{
 	case TokenType::ADD:
 		//put the (*_tokenIt).type in parse tree
-		_tokenIt++;
+		advanceToken();
 		parseAddExpression();
 		pushP(CMD::PLUS);
 		break;
 	case TokenType::SUBTRACT:
 		//put the (*_tokenIt).type in parse tree
-		_tokenIt++;
+		advanceToken();
 		parseAddExpression();
 		pushP(CMD::MINUS);
 		break;
@@ -373,7 +374,7 @@ int BasicParser::parseMultExpression()
 	{
 	case TokenType::MULTIPLY:
 		//put the (*_tokenIt).type in parse tree
-		_tokenIt++;
+		advanceToken();
 		parseMultExpression();
 		// already pushed. push operator
 		pushP(CMD::MULT);
@@ -381,7 +382,7 @@ int BasicParser::parseMultExpression()
 
 	case TokenType::DIVIDE:
 		//put the (*_tokenIt).type in parse tree
-		_tokenIt++;
+		advanceToken();
 		parseMultExpression();
 		// already pushed. push operator
 		pushP(CMD::DIV);
@@ -404,7 +405,7 @@ int BasicParser::parseNegateExpression()
 	{
 		//put negative lexeme into parse tree
 		//Ptable sequence: Value, Not
-		_tokenIt++;
+		advanceToken();
 		parseValue();
 		pushP(CMD::CONST, -1);
 		pushP(CMD::MULT);
@@ -434,11 +435,15 @@ int BasicParser::parseNegateExpression()
 int BasicParser::parseFunctionExpression()
 {
 	BasicToken token = *_tokenIt;
-	CMD cmdType;
+	CMD cmdType = CMD::NOP;
 	switch (token.type)
 	{
+	case TokenType::INT:
+		cmdType = CMD::INT;
+		break;
 	case TokenType::RND:
 		cmdType = CMD::RND;
+
 		break;
 	case TokenType::SQR:
 		cmdType = CMD::SQR;
@@ -450,17 +455,23 @@ int BasicParser::parseFunctionExpression()
 		break;
 	}
 
-	_tokenIt++;
+	advanceToken();
 	if ((*_tokenIt).type == TokenType::LEFTPAREN)
 	{
-		_tokenIt++;
-		parseValue();
+		advanceToken();
+		if (cmdType == CMD::RND)
+		{
+			parseValue();
+		}
+		{
+			parseAddExpression();
+		}
 		pushP(cmdType);
 		if ((*_tokenIt).type != TokenType::RIGHTPAREN)
 		{
 			error("Expected right parenthesis", (*_tokenIt).linenumber);
 		}
-		_tokenIt++;
+		advanceToken();
 	}
 	else
 	{
@@ -484,7 +495,8 @@ int BasicParser::parsePrintList()
 		parseExpression();
 
 		token = *_tokenIt;
-		if (token.lexeme.find_first_of(dividers) >= 0)
+		int i = token.lexeme.find_first_of(dividers);
+		if (i >= 0)
 		{
 			parsePrintList();
 		}
@@ -521,11 +533,11 @@ int BasicParser::parseValue()
 	{
 	case TokenType::LEFTPAREN:
 		//put the (*_tokenIt).type in parse tree
-		_tokenIt++;
+		advanceToken();
 		parseExpression();
 		//assert that there was a leftparen token type in parse tree before
 		assert((*_tokenIt).type == TokenType::RIGHTPAREN);
-		_tokenIt++;
+		advanceToken();
 		break;
 	case TokenType::IDENTIFIER:
 	case TokenType::NUMBERINTLITERAL:
@@ -534,11 +546,18 @@ int BasicParser::parseValue()
 	{
 		// these are all stored in the identifier table, including constants and strings
 		// the interpreter will have the type info to figure it out
-		_tokenIt++;
+		advanceToken();
 		Identifier *pIdentifier = &(*_pidentifiers)[token.lexeme];
 		pushP(CMD::IDENTIFIER, pIdentifier);
 		break;
 	}
+	case TokenType::RND:
+	case TokenType::INT:
+	case TokenType::SQR:
+	case TokenType::EXP:
+	// todo: add rest of functions here
+		parseFunctionExpression();
+		break;
 	default:
 		break;
 	}
@@ -557,7 +576,7 @@ int BasicParser::parseIdentifierList()
 	BasicToken token = *_tokenIt;
 	if (token.lexeme.find_first_of(dividers) >= 0)
 	{
-		_tokenIt++;
+		advanceToken();
 		parseIdentifierList();
 	}
 	return 0;
@@ -577,3 +596,11 @@ void BasicParser::pushP(CMD cmd , int value)
 	Px++;
 }
 
+bool BasicParser::advanceToken() {
+	if (_tokenIt != _ptokens->end())
+	{
+		_tokenIt++;
+		return true;
+	}
+	return false;
+}
