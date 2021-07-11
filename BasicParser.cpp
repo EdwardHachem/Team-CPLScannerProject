@@ -240,11 +240,12 @@ int BasicParser::parseNotExpression()
 	if ((*_tokenIt).type == TokenType::NOT)
 	{
 		_tokenIt++;
-		return !parseCompareExpression();
+		parseCompareExpression();
+		pushP(CMD::NOT);
 	}
 	else
 	{
-		return parseCompareExpression();
+		parseCompareExpression();
 	}
 	return 0;
 }
@@ -262,44 +263,43 @@ int BasicParser::parseNotExpression()
 int BasicParser::parseCompareExpression()
 {
 	BasicToken token = *_tokenIt;
-	int right;
-	int left = parseAddExpression();
+	parseAddExpression();
 	switch ((*_tokenIt).type)
 	{
 	case TokenType::EQUAL:
 		_tokenIt++;
-		right = parseCompareExpression();
-		return left == right;
+		parseCompareExpression();
+		pushP(CMD::EQ);
 		break;
 	case TokenType::GREATERTHAN:
 		_tokenIt++;
-		right = parseCompareExpression();
-		return left > right;
+		parseCompareExpression();
+		pushP(CMD::GT);
 		break;
 	case TokenType::GREATERTHANOREQUALTO:
 		_tokenIt++;
-		right = parseCompareExpression();
-		return left >= right;
+		parseCompareExpression();
+		pushP(CMD::GTE);
 		break;
 	case TokenType::NOTEQUAL:
 		_tokenIt++;
-		right = parseCompareExpression();
-		return left != right;
+		parseCompareExpression();
+		pushP(CMD::NE);
 		break;
 	case TokenType::LESSTHAN:
 		_tokenIt++;
-		right = parseCompareExpression();
-		return left < right;
+		parseCompareExpression();
+		pushP(CMD::LT);
 		break;
 	case TokenType::LESSTHANOREQUALTO:
 		_tokenIt++;
-		right = parseCompareExpression();
-		return left <= right;
+		parseCompareExpression();
+		pushP(CMD::LTE);
 		break;
 	default:
 		break;
 	}
-	return left;
+	return 0;
 }
 
 /// <summary>
@@ -311,26 +311,25 @@ int BasicParser::parseCompareExpression()
 int BasicParser::parseAddExpression()
 {
 	BasicToken token = *_tokenIt;
-	int left = parseMultExpression();
-	int right;
+	parseMultExpression();
 	switch ((*_tokenIt).type)
 	{
 	case TokenType::ADD:
 		//put the (*_tokenIt).type in parse tree
 		_tokenIt++;
-		right = parseAddExpression();
-		return left + right;
+		parseAddExpression();
+		pushP(CMD::PLUS);
 		break;
 	case TokenType::SUBTRACT:
 		//put the (*_tokenIt).type in parse tree
 		_tokenIt++;
-		right = parseAddExpression();
-		return left - right;
+		parseAddExpression();
+		pushP(CMD::MINUS);
 		break;
 	default:
 		break;
 	}
-	return left;
+	return 0;
 }
 
 /// <summary>
@@ -342,15 +341,14 @@ int BasicParser::parseAddExpression()
 int BasicParser::parseMultExpression()
 {
 	BasicToken token = *_tokenIt;
-	int left = parseNegateExpression();
+	parseNegateExpression();
 	// already pushed
-	int right;
 	switch ((*_tokenIt).type)
 	{
 	case TokenType::MULTIPLY:
 		//put the (*_tokenIt).type in parse tree
 		_tokenIt++;
-		right = parseMultExpression();
+		parseMultExpression();
 		// already pushed. push operator
 		pushP(CMD::MULT);
 		break;
@@ -358,12 +356,11 @@ int BasicParser::parseMultExpression()
 	case TokenType::DIVIDE:
 		//put the (*_tokenIt).type in parse tree
 		_tokenIt++;
-		right = parseMultExpression();
+		parseMultExpression();
 		// already pushed. push operator
 		pushP(CMD::DIV);
 		break;
 	default:
-		return left;
 		break;
 	}
 	return 0;
@@ -380,12 +377,15 @@ int BasicParser::parseNegateExpression()
 	if ((*_tokenIt).lexeme == "-")
 	{
 		//put negative lexeme into parse tree
+		//Ptable sequence: Value, Not
 		_tokenIt++;
-		return parseValue();
+		parseValue();
+		pushP(CMD::CONST, -1);
+		pushP(CMD::MULT);
 	}
 	else
 	{
-		return parseValue();
+		parseValue();
 	}
 
 	return 0;

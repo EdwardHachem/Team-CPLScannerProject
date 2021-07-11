@@ -33,7 +33,7 @@ private:
 
 	enum class CMD {	BZ, BR, BP, 
 				ASSIGN, PLUS, MINUS, MULT, DIV, 
-				EQ, GT, GTE, LT, LTE, NE,
+				EQ, GT, GTE, LT, LTE, NE, NOT,
 				STRING, CONST, IDENTIFIER,
 				PRINT, LINENUMBER
 			};
