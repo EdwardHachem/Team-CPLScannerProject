@@ -191,6 +191,9 @@ void BasicScanner::initKeywords()
 	keywords["gosub"] = TokenType::GOSUB;
 	keywords["input"] = TokenType::INPUT;
 	keywords["read"] = TokenType::READ;
+	keywords["negate"] = TokenType::NEGATE;
+	keywords["sqr"] = TokenType::SQR;
+	keywords["exp"] = TokenType::EXP;
 }
 
 char BasicScanner::advanceChar()
