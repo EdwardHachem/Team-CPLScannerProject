@@ -23,7 +23,8 @@ public:
 	int parseMultExpression();
 	int parseNegateExpression();
 	int parseFunctionExpression();
-	int parseValue();
+	int parseFOR();
+	BasicToken parseValue();
 	int parseIdentifierList();
 	int parsePrintList();
 

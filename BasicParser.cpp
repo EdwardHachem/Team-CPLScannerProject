@@ -102,9 +102,9 @@ void BasicParser::parseStatement()
 		while (_tokenIt != _ptokens->end())
 			advanceToken();
 		break;
-
+		//We don't need to do the for, the input files changed.
 	case TokenType::FOR:
-
+		//parseFOR();
 		break;
 
 	case TokenType::GOTO:
@@ -482,6 +482,30 @@ int BasicParser::parseFunctionExpression()
 }
 
 /// <summary>
+///                 | FOR Identifier = <Expression> TO <Expression>
+///					| FOR Identifier = <Expression> TO <Expression> STEP <Constant>
+/// </summary>
+/// <returns></returns>
+//int BasicParser::parseFOR()
+//{
+	//Assign identifier = expr1
+//	advanceToken();
+//	BasicToken identifierToken = *_tokenIt; //save the identifier
+//	parseValue();
+//	assert((*_tokenIt).type == TokenType::EQUAL);
+//	advanceToken();
+//	parseExpression();
+//	pushP(CMD::ASSIGN);
+//	//check if we reached the limit
+//	Identifier* pIdentifier = &(*_pidentifiers)[identifierToken.lexeme];
+//	pushP(CMD::IDENTIFIER, pIdentifier);
+//	assert((*_tokenIt).type == TokenType::TO);
+//	advanceToken();
+//	parseExpression();
+//
+//}
+
+/// <summary>
 /// <Print List> --> <Expression> <Divider> <Print List>
 ///					| <Expression>
 ///					| Blank_Statement
@@ -526,7 +550,7 @@ int BasicParser::parsePrintList()
 /// </summary>
 /// <returns></returns>
 
-int BasicParser::parseValue()
+BasicToken BasicParser::parseValue()
 {
 	BasicToken token = *_tokenIt;
 	switch (token.type)
@@ -544,6 +568,7 @@ int BasicParser::parseValue()
 	case TokenType::NUMBERDBLLITERAL:
 	case TokenType::STRINGLITERAL:
 	{
+
 		// these are all stored in the identifier table, including constants and strings
 		// the interpreter will have the type info to figure it out
 		advanceToken();
@@ -562,7 +587,7 @@ int BasicParser::parseValue()
 		break;
 	}
 	
-	return 0;
+	return token;
 }
 
 /// <summary>

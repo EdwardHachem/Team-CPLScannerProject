@@ -7,8 +7,7 @@ using namespace std;
 int main()
 {	
 	LanguageProcessor languageProcessor;
-	languageProcessor.processFile("BASIC_Input_File_2.bas");
-	
+	languageProcessor.processFile("BASIC_Input_File_1.bas");
 	return 0;
 }
 
