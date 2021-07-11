@@ -19,6 +19,10 @@ public:
 	int parseAndExpression();
 	int parseNotExpression();
 	int parseCompareExpression();
+	int parseAddExpression();
+	int parseMultExpression();
+	int parseNegateExpression();
+	int parseValue();
 
 	char dividers[3] = { ',', ';', ':' };
 private:
@@ -32,5 +36,4 @@ private:
 		cout << linenumber << " " << msg << endl;
 	}
 };
-
 
