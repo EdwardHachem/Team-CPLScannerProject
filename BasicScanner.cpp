@@ -292,7 +292,7 @@ void BasicScanner::addNumberToken()
 	}
 	if (_sourceCode[_current] == '.' && _current < _sourceCode.length())
 	{
-		TokenType type = TokenType::NUMBERDBLLITERAL;
+		type = TokenType::NUMBERDBLLITERAL;
 		if (isDigit(_sourceCode[_current + 1]))
 		{
 			_current++;

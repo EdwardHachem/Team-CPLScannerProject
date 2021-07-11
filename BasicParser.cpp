@@ -408,7 +408,7 @@ int BasicParser::parseValue()
 	case TokenType::LEFTPAREN:
 		//put the (*_tokenIt).type in parse tree
 		_tokenIt++;
-		return parseExpression();
+		parseExpression();
 		//assert that there was a leftparen token type in parse tree before
 		assert((*_tokenIt).type == TokenType::RIGHTPAREN);
 		_tokenIt++;
@@ -434,17 +434,15 @@ int BasicParser::parseValue()
 
 void BasicParser::pushP(CMD cmd, Identifier* ptr)
 {
-	P_struct pEntry;
-	pEntry.cmd = cmd;
-	pEntry.ptr = ptr;
-	P[Px++] = pEntry;
+	P[Px].cmd = cmd;
+	P[Px].ptr = ptr;
+	Px++;
 }
 
 void BasicParser::pushP(CMD cmd , int value)
 {
-	P_struct pEntry;
-	pEntry.cmd = cmd;
-	pEntry.value = value;
-	P[Px++] = pEntry;
+	P[Px].cmd = cmd;
+	P[Px].value = value;
+	Px++;
 }
 
