@@ -100,6 +100,8 @@ void BasicParser::parseStatement()
 		break;
 
 	case TokenType::END:
+		while (_tokenIt != _ptokens->end())
+			_tokenIt++;
 		break;
 
 	case TokenType::FOR:
@@ -107,6 +109,12 @@ void BasicParser::parseStatement()
 		break;
 
 	case TokenType::GOTO:
+		//push line number
+		_tokenIt++;
+		parseValue();
+
+		//push branch
+		pushP(CMD::BR);
 		break;
 
 	case TokenType::GOSUB:
@@ -134,7 +142,14 @@ void BasicParser::parseStatement()
 		}
 		break;
 	}
+
+	//Identifier List
 	case TokenType::INPUT:
+		_tokenIt++;
+		parseValue();
+		
+		//push input
+		pushP(CMD::INPUT);
 		break;
 
 	case TokenType::LET:
@@ -171,8 +186,11 @@ void BasicParser::parseStatement()
 		break;
 
 	case TokenType::PRINT:
-		// push identifier pointer
+		
+		_tokenIt++;
+		parsePrintList();
 		// push print cmd
+		pushP(CMD::PRINT);
 		break;
 
 	case TokenType::READ:
@@ -185,6 +203,15 @@ void BasicParser::parseStatement()
 		// consume and ignore all tokens on the line
 		while (_tokenIt != _ptokens->end() && (*_tokenIt).type!=TokenType::EOL)
 			_tokenIt++;
+		break;
+
+
+		//DEF FunctionID '('')' '=' < Expression > !The ID must start with FN
+	case TokenType::RND:
+	case TokenType::SQR:
+	case TokenType::EXP:
+		parseFunctionExpression();
+
 		break;
 
 	default:
@@ -207,7 +234,6 @@ int BasicParser::parseExpression()
 		int right = parseExpression();
 		return left || right;
 	}
-	
 	return left;
 }
 
@@ -393,6 +419,94 @@ int BasicParser::parseNegateExpression()
 
 
 /// <summary>
+/// 		<Function Expression> -- > ABS(<Addition Expression>)
+///			| ATN(<Addition Expression>)
+///			| COS(<Addition Expression>)
+///			| EXP(<Addition Expression>)
+///			| INT(<Addition Expression>)
+///			| LOG(<Addition Expression>)
+///			| RND(Number_Literal)
+///			| SIN(<Addition Expression>)
+///			| SQR(<Addition Expression>)
+///			| TAN(<Addition Expression>)
+/// </summary>
+/// <returns></returns>
+int BasicParser::parseFunctionExpression()
+{
+	BasicToken token = *_tokenIt;
+	CMD cmdType;
+	switch (token.type)
+	{
+	case TokenType::RND:
+		cmdType = CMD::RND;
+		break;
+	case TokenType::SQR:
+		cmdType = CMD::SQR;
+		break;
+	case TokenType::EXP:
+		cmdType = CMD::EXP;		
+		break;
+	default:
+		break;
+	}
+
+	_tokenIt++;
+	if ((*_tokenIt).type == TokenType::LEFTPAREN)
+	{
+		_tokenIt++;
+		parseValue();
+		pushP(cmdType);
+		if ((*_tokenIt).type != TokenType::RIGHTPAREN)
+		{
+			error("Expected right parenthesis", (*_tokenIt).linenumber);
+		}
+		_tokenIt++;
+	}
+	else
+	{
+		error("Expected left parenthesis", (*_tokenIt).linenumber);
+	}
+	
+	return 0;
+}
+
+/// <summary>
+/// <Print List> --> <Expression> <Divider> <Print List>
+///					| <Expression>
+///					| Blank_Statement
+/// </summary>
+/// <returns></returns>
+int BasicParser::parsePrintList()
+{
+	BasicToken token = *_tokenIt;
+	if (token.type != TokenType::EOL)
+	{
+		parseExpression();
+
+		token = *_tokenIt;
+		if (token.lexeme.find_first_of(dividers) >= 0)
+		{
+			parsePrintList();
+		}
+	}
+	else
+	{
+		//Push Blank_Statement 
+		map<string, Identifier>::iterator blankIter = _pidentifiers->find("");
+		if (blankIter == _pidentifiers->end())
+		{
+			Identifier blankIdent;
+			blankIdent.name = "";
+			blankIdent.identifierType = TokenType::STRINGLITERAL;
+			blankIdent.valueString = "";
+			(*_pidentifiers)[""] = blankIdent;
+		}
+		pushP(CMD::STRING, &(*_pidentifiers)[""]);
+	}
+	return 0;
+}
+
+/// <summary>
 /// <Value> --> ( <Expression> )
 ///				| Identifier
 ///				| <Constant>
@@ -418,7 +532,7 @@ int BasicParser::parseValue()
 	case TokenType::NUMBERDBLLITERAL:
 	case TokenType::STRINGLITERAL:
 	{
-		// these are all stored in teh identifier table, including constants and strings
+		// these are all stored in the identifier table, including constants and strings
 		// the interpreter will have the type info to figure it out
 		_tokenIt++;
 		Identifier *pIdentifier = &(*_pidentifiers)[token.lexeme];
@@ -429,6 +543,23 @@ int BasicParser::parseValue()
 		break;
 	}
 	
+	return 0;
+}
+
+/// <summary>
+///<Identifier List> --> Identifier <Divider> <Identifier List>
+///						| Identifier
+/// </summary>
+/// <returns></returns>
+int BasicParser::parseIdentifierList()
+{
+	parseValue();
+	BasicToken token = *_tokenIt;
+	if (token.lexeme.find_first_of(dividers) >= 0)
+	{
+		_tokenIt++;
+		parseIdentifierList();
+	}
 	return 0;
 }
 

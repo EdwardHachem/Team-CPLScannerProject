@@ -22,19 +22,22 @@ public:
 	int parseAddExpression();
 	int parseMultExpression();
 	int parseNegateExpression();
+	int parseFunctionExpression();
 	int parseValue();
+	int parseIdentifierList();
+	int parsePrintList();
 
 	char dividers[3] = { ',', ';', ':' };
 private:
 	list<BasicToken> *_ptokens;
-	map<string, Identifier > *_pidentifiers;
+	map<string, Identifier> *_pidentifiers;
 	list<BasicToken>::iterator _tokenIt;
 
 
 	enum class CMD {	BZ, BR, BP, 
 				ASSIGN, PLUS, MINUS, MULT, DIV, 
-				EQ, GT, GTE, LT, LTE, NE, NOT,
-				STRING, CONST, IDENTIFIER,
+				EQ, GT, GTE, LT, LTE, NE, NOT, RND, SQR, EXP, INPUT,
+				STRING, CONST, IDENTIFIER, 
 				PRINT, LINENUMBER
 			};
 
