@@ -41,7 +41,7 @@ int main()
 {	
 	LanguageProcessor languageProcessor;
 	//languageProcessor.processFile("BASIC_Input_File_2.bas");
-	
+	//this will ask the user to enter one of the two
     cout << "Enter the name of the data file\n Basic_Input_File_1 or\nBasic_Input_File_2";
     cin >> fileName;
     cout<<endl;
