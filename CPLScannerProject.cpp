@@ -21,7 +21,7 @@ int main()
 	{
 		cout<<"file does not exist, using default"<<endl;
 		ifile.close();
-		languageProcessor.processFile(default);
+		languageProcessor.processFile(defaultname);
 	}
 	
 	return 0;
