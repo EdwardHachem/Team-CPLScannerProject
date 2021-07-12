@@ -10,7 +10,7 @@ int main()
 	cout<< "Enter a file name: ,default is BASIC_Input_File_1.bas"<<endl;
 	string defaultname = "BASIC_Input_File_1.bas";
 	string fname;
-	cin>>fname;
+	getline(cin, fname);
 	ifstream ifile;
 	ifile.open(fname);
 	if(ifile){

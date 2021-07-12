@@ -24,6 +24,7 @@ public:
 	int parseNegateExpression();
 	int parseFunctionExpression();
 	int parseFOR();
+	int parsePowerExpression();
 	BasicToken parseValue();
 	int parseIdentifierList();
 	int parsePrintList();
@@ -36,7 +37,7 @@ private:
 
 
 	enum class CMD {	BZ, BR, BP, 
-				ASSIGN, PLUS, MINUS, MULT, DIV, 
+				ASSIGN, PLUS, MINUS, MULT, DIV, POWER,
 				EQ, GT, GTE, LT, LTE, NE, NOT, RND, SQR, EXP, INPUT, INT,
 				STRING, CONST, IDENTIFIER, NOP,
 				PRINT, LINENUMBER

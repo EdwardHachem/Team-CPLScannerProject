@@ -185,8 +185,8 @@ void BasicParser::parseStatement()
 		}
 		break;
 	}
-	case TokenType::NEXT:
-		break;
+	//case TokenType::NEXT:
+		//break;
 
 	case TokenType::PRINT:
 		
@@ -202,6 +202,7 @@ void BasicParser::parseStatement()
 	case TokenType::RETURN:
 		break;
 
+	case TokenType::NEXT: //we are ignoring next for now and treating it as rem
 	case TokenType::REM:
 		// consume and ignore all tokens on the line
 		while (_tokenIt != _ptokens->end() && (*_tokenIt).type!=TokenType::EOL)
@@ -361,16 +362,18 @@ int BasicParser::parseAddExpression()
 	return 0;
 }
 
+
+//					NEW MULTIPLY
 /// <summary>
-/// <Multiplication Expression> --> <Negate Expression> * <Multiplication Expression>
-///								| <Negate Expression> / <Multiplication Expression>
-///								| <Negate Expression>
+///				<Multiplication Expression> -- > <Power Expression>* <Multiplication Expression>
+///				| <Power Expression> / <Multiplication Expression>
+///				| <Power Expression>
 /// </summary>
 /// <returns></returns>
 int BasicParser::parseMultExpression()
 {
 	BasicToken token = *_tokenIt;
-	parseNegateExpression();
+	parsePowerExpression();
 	// already pushed
 	switch ((*_tokenIt).type)
 	{
@@ -544,6 +547,37 @@ int BasicParser::parsePrintList()
 	return 0;
 }
 
+
+
+
+
+/// <summary>
+/// <Power Expression> --> <Negate Expression> ^ <Power Expression>
+///							| <Negate Expression>
+/// </summary>
+/// <returns></returns>
+int BasicParser::parsePowerExpression()
+{
+	BasicToken token = *_tokenIt;
+	parseNegateExpression();
+	// already pushed
+	switch ((*_tokenIt).type)
+	{
+	case TokenType::POWER:
+		//put the (*_tokenIt).type in parse tree
+		advanceToken();
+		parsePowerExpression();
+		// already pushed. push operator
+		pushP(CMD::POWER);
+		break;
+
+	default:
+		break;
+	}
+	return 0;
+}
+
+
 /// <summary>
 /// <Value> --> ( <Expression> )
 ///				| Identifier
@@ -551,7 +585,6 @@ int BasicParser::parsePrintList()
 ///				| <Function Expression>
 /// </summary>
 /// <returns></returns>
-
 BasicToken BasicParser::parseValue()
 {
 	BasicToken token = *_tokenIt;
@@ -561,8 +594,8 @@ BasicToken BasicParser::parseValue()
 		//put the (*_tokenIt).type in parse tree
 		advanceToken();
 		parseExpression();
-		//assert that there was a leftparen token type in parse tree before
-		//assert((*_tokenIt).type == TokenType::RIGHTPAREN);
+		//assert that there was a rightparen token type in parse tree before
+		assert((*_tokenIt).type == TokenType::RIGHTPAREN);
 		advanceToken();
 		break;
 	case TokenType::IDENTIFIER:
