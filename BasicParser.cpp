@@ -135,7 +135,9 @@ void BasicParser::parseStatement()
 			advanceToken();
 			int codeLineNumber = stoi((*_tokenIt).lexeme);
 			pushP(CMD::LINENUMBER, codeLineNumber);
-			pushP(CMD::BP, NULL);
+			
+			//made a change here, pushP(CMD::BP, NULL);
+			pushP(CMD::BP);
 		}
 		else
 		{
@@ -560,7 +562,7 @@ BasicToken BasicParser::parseValue()
 		advanceToken();
 		parseExpression();
 		//assert that there was a leftparen token type in parse tree before
-		assert((*_tokenIt).type == TokenType::RIGHTPAREN);
+		//assert((*_tokenIt).type == TokenType::RIGHTPAREN);
 		advanceToken();
 		break;
 	case TokenType::IDENTIFIER:
