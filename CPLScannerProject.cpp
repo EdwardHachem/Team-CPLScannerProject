@@ -11,7 +11,19 @@ int main()
 	string defaultname = "BASIC_Input_File_1.bas";
 	string fname;
 	cin>>fname;
-	languageProcessor.processFile("BASIC_Input_File_1.bas");
+	ifstream ifile;
+	ifile.open(fname);
+	if(ifile){
+		ifile.close();
+		languageProcessor.processFile(fname);
+	}
+	else
+	{
+		cout<<"file does not exist, using default"<<endl;
+		ifile.close();
+		languageProcessor.processFile(default);
+	}
+	
 	return 0;
 }
 
