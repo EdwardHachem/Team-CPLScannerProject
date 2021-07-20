@@ -2,6 +2,7 @@
 #include <string>
 #include <ostream>
 #include "BasicParser.h"
+#include "Interpreter.h"
 using namespace std;
 
 void LanguageProcessor::processLine(string code, int linenumber)
@@ -34,6 +35,9 @@ void LanguageProcessor::processFile(string fileName)
 		BasicParser parser;
 		parser.init(&_tokens, &identifiers);
 		parser.parse();
+
+		Interpreter interpreter;
+		interpreter.init(parser.getPtable(), parser.getPtableCount(), &identifiers, parser.getLinenumberMap());
 	}
 	else cout << "File not found.";
 }

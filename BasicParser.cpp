@@ -547,6 +547,21 @@ int BasicParser::parsePrintList()
 	return 0;
 }
 
+P_struct* BasicParser::getPtable()
+{
+	return P;
+}
+
+int BasicParser::getPtableCount()
+{
+	return Px;
+}
+
+map<int, int>* BasicParser::getLinenumberMap()
+{
+	return &ProgramLineNumberToPx;
+}
+
 
 
 
@@ -621,7 +636,6 @@ BasicToken BasicParser::parseValue()
 	default:
 		break;
 	}
-	
 	return token;
 }
 

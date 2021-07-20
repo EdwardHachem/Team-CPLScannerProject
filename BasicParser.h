@@ -5,6 +5,23 @@
 #include "BasicToken.h"
 #include "Identifier.h"
 
+enum class CMD {
+	BZ, BR, BP,
+	ASSIGN, PLUS, MINUS, MULT, DIV, POWER,
+	EQ, GT, GTE, LT, LTE, NE, NOT, RND, SQR, EXP, INPUT, INT,
+	STRING, CONST, IDENTIFIER, NOP,
+	PRINT, LINENUMBER, STACKINT, STACKDOUBLE
+};
+
+struct P_struct {
+	CMD cmd;
+	union {
+		int value;
+		double dblValue;
+		Identifier* ptr;
+	};
+};
+
 class BasicParser
 {
 public:
@@ -28,6 +45,9 @@ public:
 	BasicToken parseValue();
 	int parseIdentifierList();
 	int parsePrintList();
+	P_struct* getPtable();
+	int getPtableCount();
+	map <int, int>* getLinenumberMap();
 
 	char dividers[3] = {',', ';', ':'};
 private:
@@ -35,23 +55,7 @@ private:
 	map<string, Identifier> *_pidentifiers;
 	list<BasicToken>::iterator _tokenIt;
 
-
-	enum class CMD {	BZ, BR, BP, 
-				ASSIGN, PLUS, MINUS, MULT, DIV, POWER,
-				EQ, GT, GTE, LT, LTE, NE, NOT, RND, SQR, EXP, INPUT, INT,
-				STRING, CONST, IDENTIFIER, NOP,
-				PRINT, LINENUMBER
-			};
-
-	struct P_struct{
-		CMD cmd;
-		union {
-			int value;
-			Identifier* ptr;
-		};
-	};
-
-	P_struct P[10000];
+	P_struct P[1000];
 	int Px=0;
 
 	map<int, int> ProgramLineNumberToPx;
