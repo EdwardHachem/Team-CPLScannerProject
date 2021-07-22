@@ -10,16 +10,13 @@ enum class CMD {
 	ASSIGN, PLUS, MINUS, MULT, DIV, POWER,
 	EQ, GT, GTE, LT, LTE, NE, NOT, RND, SQR, EXP, INPUT, INT,
 	STRING, CONST, IDENTIFIER, NOP,
-	PRINT, LINENUMBER, STACKINT, STACKDOUBLE
+	PRINT, LINENUMBER
 };
 
 struct P_struct {
 	CMD cmd;
-	union {
-		int value;
-		double dblValue;
-		Identifier* ptr;
-	};
+	Identifier* ptr;
+	int value;
 };
 
 class BasicParser
@@ -60,7 +57,7 @@ private:
 
 	map<int, int> ProgramLineNumberToPx;
 	void pushP(CMD, Identifier *ptr);
-	void pushP(CMD, int value=0);
+	void pushP(CMD, int value = 0);
 
 	bool advanceToken();
 	void error(const string& msg, int linenumber) {

@@ -38,6 +38,7 @@ void LanguageProcessor::processFile(string fileName)
 
 		Interpreter interpreter;
 		interpreter.init(parser.getPtable(), parser.getPtableCount(), &identifiers, parser.getLinenumberMap());
+		interpreter.interpret();
 	}
 	else cout << "File not found.";
 }

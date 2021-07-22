@@ -192,8 +192,6 @@ void BasicParser::parseStatement()
 		
 		advanceToken();
 		parsePrintList();
-		// push print cmd
-		pushP(CMD::PRINT);
 		break;
 
 	case TokenType::READ:
@@ -522,11 +520,14 @@ int BasicParser::parsePrintList()
 	if (token.type != TokenType::EOL)
 	{
 		parseExpression();
+		// push print cmd
+		pushP(CMD::PRINT);
 
 		token = *_tokenIt;
 		int i = token.lexeme.find_first_of(dividers);
 		if (i >= 0)
 		{
+			advanceToken();
 			parsePrintList();
 		}
 	}
@@ -633,6 +634,7 @@ BasicToken BasicParser::parseValue()
 	// todo: add rest of functions here
 		parseFunctionExpression();
 		break;
+
 	default:
 		break;
 	}

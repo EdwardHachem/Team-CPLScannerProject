@@ -33,27 +33,28 @@ void Interpreter::interpret()
 		{
 			getItem(dblValue1, dval1, val1);
 			getItem(dblValue2, dval2, val2);
-			if (dblValue1 && dblValue2) //Checks for doubles. I didn't include this in the later tests as the examples don't use doubles.
-			{
-				item1.dblValue = dval1 + dval2;
-				item1.cmd = CMD::STACKDOUBLE;
-				S.push(item1);
-			}
-			else if (dblValue1 && !dblValue2) {
-				item1.dblValue = dval1 + val2;
-				item1.cmd = CMD::STACKDOUBLE;
-				S.push(item1);
-			}
-			else if (!dblValue1 && dblValue2) {
-				item1.dblValue = val1 + dval2;
-				item1.cmd = CMD::STACKDOUBLE;
-				S.push(item1);
-			}
-			else if (!dblValue1 && !dblValue2) {
-				item1.value = val1 + val2;
-				item1.cmd = CMD::STACKINT;
-				S.push(item1);
-			}
+			//if (dblValue1 && dblValue2) //Checks for doubles. I didn't include this in the later tests as the examples don't use doubles.
+			//{
+			//	item1.dblValue = dval1 + dval2;
+			//	item1.cmd = CMD::STACKDOUBLE;
+			//	S.push(item1);
+			//}
+			//else if (dblValue1 && !dblValue2) {
+			//	item1.dblValue = dval1 + val2;
+			//	item1.cmd = CMD::STACKDOUBLE;
+			//	S.push(item1);
+			//}
+			//else if (!dblValue1 && dblValue2) {
+			//	item1.dblValue = val1 + dval2;
+			//	item1.cmd = CMD::STACKDOUBLE;
+			//	S.push(item1);
+			//}
+			//else if (!dblValue1 && !dblValue2) {
+			string name = getUniqueName();
+			item1.ptr = createIdentifier(name, val1 + val2);
+			item1.cmd = CMD::IDENTIFIER;
+			S.push(item1);
+		//}
 			break;
 		}
 
@@ -61,8 +62,9 @@ void Interpreter::interpret()
 		{
 			getItem(dblValue1, dval1, val1);
 			getItem(dblValue2, dval2, val2);
-			item1.value = val1 * val2;
-			item1.cmd = CMD::STACKINT;
+			string name = getUniqueName();
+			item1.ptr = createIdentifier(name, val1 * val2);
+			item1.cmd = CMD::IDENTIFIER;
 			S.push(item1);
 			break;
 		}
@@ -71,8 +73,20 @@ void Interpreter::interpret()
 		{
 			getItem(dblValue1, dval1, val1);
 			getItem(dblValue2, dval2, val2);
-			item1.value = val1 / val2;
-			item1.cmd = CMD::STACKINT;
+			string name = getUniqueName();
+			item1.ptr = createIdentifier(name, val2 / val1);
+			item1.cmd = CMD::IDENTIFIER;
+			S.push(item1);
+			break;
+		}
+
+		case CMD::INT:
+		{
+			getItem(dblValue1, dval1, val1);
+			// convert to int and then push.
+			string name = getUniqueName();
+			item1.ptr = createIdentifier(name, val1);
+			item1.cmd = CMD::IDENTIFIER;
 			S.push(item1);
 			break;
 		}
@@ -81,25 +95,31 @@ void Interpreter::interpret()
 		{
 			getItem(dblValue1, dval1, val1);
 			getItem(dblValue2, dval2, val2);
-			item1.value = val1 - val2;
-			item1.cmd = CMD::STACKINT;
+			string name = getUniqueName();
+			item1.ptr = createIdentifier(name, val2 - val1);
+			item1.cmd = CMD::IDENTIFIER;
 			S.push(item1);
 			break;
 		}
 
+		case CMD::PRINT:
+			getItem(dblValue1, dval1, val1);
+			cout << val1 << endl;
+			break;
+
 		case CMD::ASSIGN:
 		{
 			Identifier *pid1, *pid2;
+
 			pid1 = getItem(dblValue1, dval1, val1);
 			pid2 = getItem(dblValue2, dval2, val2);
-
 			switch (pid1->identifierType)
 			{
-			case TokenType::DOUBLE:
+			case TokenType::NUMBERDBLLITERAL:
 				pid2->valueDouble = pid1->valueDouble;
 				break;
 
-			case TokenType::INT:
+			case TokenType::NUMBERINTLITERAL:
 				pid2->valueInt = pid1->valueInt;
 				break;
 
@@ -108,18 +128,22 @@ void Interpreter::interpret()
 				pid2->identifierType = TokenType::STRINGIDENTIFIER;
 				pid2->valueString = pid1->valueString;
 				break;
-
-			case TokenType::PRINT:
-				getItem(dblValue1, dval1, val1);
-				cout << val1 << endl;
-				break;
-
 			default:
 				break;
 			}
 		}
 		}
 	}
+}
+
+Identifier* Interpreter::createIdentifier(const string &name, int value)
+{
+	Identifier identifier;
+	identifier.identifierType = TokenType::NUMBERINTLITERAL;
+	identifier.name = name;
+	identifier.valueInt = value;
+	(*_pidentifiers)[name] = identifier;
+	return &(*_pidentifiers)[name];
 }
 
 
@@ -129,13 +153,6 @@ Identifier *Interpreter::getItem(bool& dblValue1, double& dval1, int& val1)
 	S.pop();
 	switch (item1.cmd)
 	{
-	case CMD::STACKDOUBLE:
-		dblValue1 = true;
-		dval1 = item1.dblValue;
-		break;
-	case CMD::STACKINT:
-		val1 = item1.value;
-		break;
 	case CMD::IDENTIFIER:
 	{
 		if (item1.ptr->identifierType == TokenType::DOUBLE)
@@ -147,10 +164,19 @@ Identifier *Interpreter::getItem(bool& dblValue1, double& dval1, int& val1)
 		{
 			val1 = item1.ptr->valueInt;
 		}
+		break;
 	}
 	default:
+		return nullptr;
 		break;
 	}
 	return item1.ptr;
+
+}
+
+string Interpreter::getUniqueName()
+{
+
+	return string(_unique + to_string(_uniqueint++));
 }
 

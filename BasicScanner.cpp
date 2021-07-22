@@ -57,6 +57,10 @@ void BasicScanner::scanToken()
 	case '\n':
 		break;
 
+	case ',':
+		addToken(keywords[","], ",");
+		break;
+
 	case '\'':
 		addToken(keywords["'"], "'");
 		break;
@@ -158,6 +162,7 @@ void BasicScanner::initKeywords()
 	keywords[">"] = TokenType::GREATERTHAN;
 	keywords[">="] = TokenType::GREATERTHANOREQUALTO;
 	keywords["^"] = TokenType::POWER;
+	keywords[","] = TokenType::COMMA;
 	keywords["and"] = TokenType::AND;
 	keywords["as"] = TokenType::AS;
 	keywords["cdbl"] = TokenType::CDBL;
